@@ -14,11 +14,20 @@ void JCDemoDatabase::verifyTable(QSqlDatabase db, QString tableName)
 {
     if (tableExist(db, tableName) == true) {
         if (tableCorrect(db, tableName) == false) {
-            dropTable(db, tableName);
-            createTable(db, tableName);
+            if (dropTable(db, tableName) == false) {
+                QMessageBox::critical(this, QString("Error"), QString("Can not drop table!"), QMessageBox::Abort);
+                return;
+            }
+            if (createTable(db, tableName) == false) {
+                QMessageBox::critical(this, QString("Error"), QString("Can not create table! - 1"), QMessageBox::Abort);
+                return;
+            }
         }
     } else {
-        createTable(db, tableName);
+        if (createTable(db, tableName) == false) {
+            QMessageBox::critical(this, QString("Error"), QString("Can not create table! - 2"), QMessageBox::Abort);
+            return;
+        }
     }
 }
 
@@ -55,18 +64,8 @@ bool JCDemoDatabase::tableCorrect(QSqlDatabase db, QString tableName)
     columnCount = model->columnCount();
 
     // 3 - column count correct
-    if (columnCount != (Table::Field::Count + 1)) { // PrimaryKey
+    if (columnCount != (Table::Field::Count + 2)) { // RowNumber & PrimaryKey
         return false;
-    }
-
-    // 4 - not null
-    for (int32_t rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-        for (int32_t columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-            if (model->data(model->index(rowIndex, columnIndex)).toString().isNull()) {
-                model->setData(model->index(rowIndex, columnIndex), QString(""));
-            }
-        }
-        model->submitAll();
     }
 
     return true;
@@ -109,6 +108,21 @@ bool JCDemoDatabase::createTable(QSqlDatabase db, QString tableName)
     sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::F]));
     sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::G]));
     sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::H]));
+    sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::I]));
+    sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::J]));
+    sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::K]));
+    sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::L]));
+    sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::M]));
+    sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::N]));
+    sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::O]));
+    sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::P]));
+    sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::Q1]));
+    sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::Q2]));
+    sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::Q3]));
+    sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::Q4]));
+    sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::Q5]));
+    sql.append(QStringLiteral("%1           VARCHAR(255),").arg(Table::FieldText[Table::Field::Q6]));
+    sql.append(QStringLiteral("%1           INTEGER UNIQUE,").arg(Table::RowNumber));
     sql.append(QStringLiteral("%1           INTEGER PRIMARY KEY AUTOINCREMENT").arg(Table::PrimaryKey)); // 最后一个不能有逗号
     sql.append(QStringLiteral(")"));
 
@@ -123,12 +137,13 @@ bool JCDemoDatabase::createTable(QSqlDatabase db, QString tableName)
     model = new QSqlTableModel(nullptr, db);
     model->setTable(tableName);
 
-    for (int32_t rowIndex = 0; rowIndex < 50; rowIndex++) {
+    for (int32_t rowIndex = 0; rowIndex < 10000; rowIndex++) {
         model->insertRows(rowIndex, 1);
         for (int32_t columnIndex = Table::Field::Min; columnIndex <= Table::Field::Max; columnIndex++) {
             model->setData(model->index(rowIndex, columnIndex), QString("d%1").arg(rowIndex + 1));
         }
-        // PrimaryKey: Auto
+        // RowNumber
+        model->setData(model->index(rowIndex, Table::Field::Count), rowIndex);
         model->submitAll();
     }
 

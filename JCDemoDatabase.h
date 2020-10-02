@@ -42,6 +42,9 @@ private:
     // Init
     void initialize(void);
 
+//    int32_t insertPrimaryKey(QSqlTableModel *model, int32_t row);
+//    int32_t removePrimaryKey(QSqlTableModel *model, int32_t row);
+
 private slots:
     void onInsertClicked(void);
     void onRemoveClicked(void);

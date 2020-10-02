@@ -15,14 +15,29 @@ public:
         F,
         G,
         H,
+        I,
+        J,
+        K,
+        L,
+        M,
+        N,
+        O,
+        P,
+        Q1,
+        Q2,
+        Q3,
+        Q4,
+        Q5,
+        Q6,
         Min = A,
-        Max = H,
+        Max = Q6,
         Count
     };
 
-    static QString Name;
-    static QString PrimaryKey;
     static QString FieldText[Field::Count];
+    static QString Name;
+    static QString RowNumber;
+    static QString PrimaryKey;
 };
 
 #endif // TABLE_H
